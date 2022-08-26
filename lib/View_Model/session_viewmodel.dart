@@ -1,15 +1,15 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
-
+import '../Models/session_model.dart';
 
 class ProgressController extends GetxController
 {
-  final now = DateTime.now();
-  final count = 0.obs;
 
+  final now = DateTime.now();
+  final bools = [false,false,false,false,false,false,false,false,false,false].obs;
+  final count = 0.obs;
+  final data = <Session>[].obs;
    @override
    void onInit() {
     // TODO: implement onInit
@@ -23,9 +23,28 @@ class ProgressController extends GetxController
      var Ref = fb.ref("sessions");
 
     Ref.onChildAdded.listen((event) {
-       count.value = event.snapshot.children.length;
-       // count.refresh();
-       print(count.value);
+      var snapshot = event.snapshot;
+      if(event.snapshot.key == date)
+        {
+          Iterable<DataSnapshot> children = snapshot.children;
+          for (var element in children) {
+            Session s = Session();
+            s.timeStamp = element.key.toString();
+            s.session = element.value.toString();
+            data.add(s);
+          }
+          count.value = event.snapshot.children.length;
+          count.refresh();
+          for (int i=0; i<count.value; i++)
+            {
+              bools[i] = true;
+            }
+          print(event.snapshot.children.length);
+        }
      });
    }
+
+
+
 }
+

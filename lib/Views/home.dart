@@ -6,7 +6,6 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:get/get.dart';
 import 'package:timeline_tile/timeline_tile.dart';
 import 'package:intl/intl.dart';
-import 'package:fitness/View_Model/session_viewmodel.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
 class Home extends StatefulWidget {
@@ -18,174 +17,278 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final progController = Get.put(ProgressController());
-  final fb = FirebaseDatabase.instanceFor(app: Firebase.app(),databaseURL: "https://fitness-87807-default-rtdb.asia-southeast1.firebasedatabase.app");
+  final fb = FirebaseDatabase.instanceFor(
+      app: Firebase.app(),
+      databaseURL:
+          "https://fitness-87807-default-rtdb.asia-southeast1.firebasedatabase.app");
   @override
-
   Widget build(BuildContext context) {
-
     var size = MediaQuery.of(context).size;
     return Scaffold(
         floatingActionButton: InkWell(
-          onTap: (){
+          onTap: () {
             _addsession();
             progController.getCount();
           },
           child: Container(
-            width: size.width*0.6,
-            height: size.height*0.07,
+            width: size.width * 0.6,
+            height: size.height * 0.07,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(30),
-              color: Color(0xff5196ff),
-                boxShadow: [new BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
-                  blurRadius: 20.0,
-                ),]
-            ),
-            child: Center(child: Text("Start Session", style: TextStyle(color: Colors.white),)),
+                borderRadius: BorderRadius.circular(30),
+                color: Color(0xff5196ff),
+                boxShadow: [
+                  new BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    blurRadius: 20.0,
+                  ),
+                ]),
+            child: Center(
+                child: Text(
+              "Start Session",
+              style: TextStyle(color: Colors.white),
+            )),
           ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.only(left: 18.0,top: 20),
-          child: Container(
-            width: size.width,
-            height: size.height,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Good Morning,\nJane",style: h1,),
-                Obx(()=> HeadingCard(size,(progController.count/10 )*100)),
-                Padding(
-                  padding: const EdgeInsets.all(18.0),
-                  child: SingleChildScrollView(child: TimeLine(size)),
-                )
-
-
-              ],
+        body: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.only(left: 18.0, top: 20),
+            child: Container(
+              width: size.width,
+              height: size.height,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Good Morning,\nJane",
+                    style: h1,
+                  ),
+                  Obx(() => HeadingCard(
+                      size, ((progController.count / 10) * 100).toInt())),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: size.height*0.6,
+                            child: ListView.builder(
+                                itemCount: 10,
+                                itemBuilder: (context, index) {
+                                  return Obx(()=> TimeLine(size, progController.bools[index], index));
+                                }),
+                          )
+                        ],
+                      ),
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
-        ),
-      )
-      
-    );
+        ));
   }
-  Future<void> _addsession()
-  async {
+
+  Future<void> _addsession() async {
     final now = new DateTime.now();
-    String formatter = now.toString().substring(0,10);
+    String formatter = now.toString().substring(0, 10);
     String time = DateFormat.jm().format(now);
     var ref = fb.ref('sessions/$formatter/$time');
     await ref.set("Session 7");
   }
 }
 
-
-Widget HeadingCard(size, percentage)
-{
+Widget HeadingCard(size, percentage) {
   return Container(
-    width: size.width*0.90,
-    height: size.height*0.15,
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(10),
-      border: Border.all(color: Color(0xff9c9c9c), width: 4, ),
-    ),
-    child: Column(
-      children: [
-        SizedBox(
-          child: Padding(
-            padding: const EdgeInsets.all(3.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text("Today's Progress", style: h2,),
-                Text("$percentage%",style: h2.copyWith(color: Colors.blue, fontWeight: FontWeight.bold),),
-              ],
+      width: size.width * 0.90,
+      height: size.height * 0.15,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: Color(0xff9c9c9c),
+          width: 2.5,
+        ),
+      ),
+      child: Column(
+        children: [
+          SizedBox(
+            child: Padding(
+              padding: const EdgeInsets.all(3.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    "Today's Progress",
+                    style: h2,
+                  ),
+                  Text(
+                    "$percentage%",
+                    style: h2.copyWith(
+                        color: Colors.blue, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(left:10.0),
-          child: LinearPercentIndicator(
-            width: size.width*0.82,
-            lineHeight: 14.0,
-            percent: percentage/100,
-            backgroundColor: Colors.grey,
-            progressColor: Colors.blue,
+          Padding(
+            padding: const EdgeInsets.only(left: 10.0),
+            child: LinearPercentIndicator(
+              barRadius: Radius.circular(30),
+              width: size.width * 0.82,
+              lineHeight: 14.0,
+              percent: percentage / 100,
+              backgroundColor: Colors.grey,
+              progressColor: Colors.blue,
+            ),
           ),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Icon(Icons.airplane_ticket, size: 30,),
-                ),
-                SizedBox(width: 10,),
-                Column(
-                  children: [
-                    Text("Completed"),
-                    Text("2 Sessions")
-                  ],
-                )
-              ],
-            ),
-            Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Icon(Icons.airplane_ticket, size: 30,),
-                ),
-                SizedBox(width: 10,),
-                Column(
-                  children: [
-                    Text("Pending"),
-                    Text("2 Sessions")
-                  ],
-                )
-              ],
-            ),
-          ],
-        )
-
-      ],
-    )
-  );
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Image.asset(
+                      'assets/images/pending.png',
+                      scale: 1.2,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Column(
+                    children: [
+                      Text(
+                        "Completed",
+                        style: sub1,
+                      ),
+                      Text(
+                        "${(percentage / 10).toInt()} Sessions",
+                        style: sub1.copyWith(fontWeight: FontWeight.bold),
+                      )
+                    ],
+                  )
+                ],
+              ),
+              Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Image.asset(
+                      'assets/images/Done.png',
+                      scale: 1.2,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Column(
+                    children: [
+                      Text(
+                        "Pending",
+                        style: sub1,
+                      ),
+                      Text(
+                        "${(10 - percentage / 10).toInt()} Sessions",
+                        style: sub1.copyWith(fontWeight: FontWeight.bold),
+                      )
+                    ],
+                  )
+                ],
+              ),
+            ],
+          )
+        ],
+      ));
 }
 
-Widget TimeLine(size)
-{
+Widget TimeLine(size, status, index) {
   return Column(
     children: [
       TimelineTile(
-        afterLineStyle: LineStyle(color: Colors.blue),
+        beforeLineStyle: status ? LineStyle(color: Colors.blue) : LineStyle(color: Colors.grey),
+        afterLineStyle: status ? LineStyle(color: Colors.blue) : LineStyle(color: Colors.grey) ,
         alignment: TimelineAlign.start,
-        isFirst: true,
-        endChild: Container(
-          constraints: const BoxConstraints(
-            minHeight: 120,
+        indicatorStyle: IndicatorStyle(
+            indicator: Container(
+          decoration: BoxDecoration(
+            color: status ? Colors.blueAccent : Colors.grey,
+            shape: BoxShape.circle,
           ),
-          color: Colors.lightGreenAccent,
-        ),
-      ),
-
-      TimelineTile(
-        beforeLineStyle: LineStyle(color: Colors.blue),
-        alignment: TimelineAlign.start,
-        hasIndicator: true,
+          child: Center(
+              child: status ? Icon(
+            Icons.done_sharp,
+            size: 12,
+            color: Colors.white,
+          ): null),
+        )),
+        isFirst: index==0 ? true : false,
         endChild: Padding(
-          padding: const EdgeInsets.only(top: 8.0),
-          child: Container(
-            constraints: const BoxConstraints(
-              minHeight: 120,
-            ),
-            color: Colors.lightGreenAccent,
-
-          ),
-        ),
+            padding: const EdgeInsets.all(18.0),
+            child: SessionCard(size, status)),
       ),
+    ],
+  );
+}
+
+Widget SessionCard(size, status) {
+  return Stack(
+    children: [
+      Container(
+          constraints: BoxConstraints(minHeight: size.height * 0.2),
+          color: status ? Colors.grey.withOpacity(0.35) : Colors.transparent),
+      Container(
+          constraints: BoxConstraints(minHeight: size.height * 0.2),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    "Session 1",
+                    style:
+                        h2.copyWith(fontWeight: FontWeight.w600, fontSize: 21),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(22),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          left: 20, right: 20, top: 8, bottom: 8),
+                      child: Text(
+                        "Completed",
+                        style: sub1.copyWith(color: Colors.white, fontSize: 10),
+                      ),
+                    ),
+                  ),
+                  Text(
+                    "Performed at\n 8:02 PM",
+                    style: sub1,
+                  )
+                ],
+              ),
+              Container(
+                width: size.width * 0.35,
+                height: size.height * 0.18,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                      fit: BoxFit.cover,
+                      image: AssetImage('assets/images/1.jpg')),
+                  borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                  color: Colors.redAccent,
+                ),
+              ),
+            ],
+          ),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: Color(0xff9c9c9c),
+              width: 2.5,
+            ),
+          )),
     ],
   );
 }
