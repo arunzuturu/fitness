@@ -2,6 +2,7 @@
 import 'package:fitness/View_Model/rehab_viewmodel.dart';
 import 'package:fitness/View_Model/session_viewmodel.dart';
 import 'package:fitness/constants.dart';
+import 'package:flutter/cupertino.dart';
 import "package:flutter/material.dart";
 import 'package:get/get.dart';
 import 'package:timeline_tile/timeline_tile.dart';
@@ -39,11 +40,18 @@ class _HomeState extends State<Home> {
                     blurRadius: 20.0,
                   ),
                 ]),
-            child: const Center(
-                child: Text(
+            child:Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(CupertinoIcons.play_fill, color: Colors.white,),
+                    SizedBox(width: size.width*0.02,),
+                    const Text(
               "Start Session",
               style: TextStyle(color: Colors.white),
-            )),
+            ),
+                  ],
+                )),
           ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -167,7 +175,7 @@ Widget HeadingCard(size, percentage) {
                       scale: 1.2,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 10,
                   ),
                   Column(
@@ -194,8 +202,8 @@ Widget TimeLine(size, status, index, sessions) {
   return Column(
     children: [
       TimelineTile(
-        beforeLineStyle: status ? LineStyle(color: Colors.blue) : LineStyle(color: Colors.grey),
-        afterLineStyle: status ? LineStyle(color: Colors.blue) : LineStyle(color: Colors.grey) ,
+        beforeLineStyle: status ? const LineStyle(color: Colors.blue) : const LineStyle(color: Colors.grey),
+        afterLineStyle: status ? const LineStyle(color: Colors.blue) : const LineStyle(color: Colors.grey) ,
         alignment: TimelineAlign.start,
         indicatorStyle: IndicatorStyle(
             indicator: Container(
@@ -204,7 +212,7 @@ Widget TimeLine(size, status, index, sessions) {
             shape: BoxShape.circle,
           ),
           child: Center(
-              child: status ? Icon(
+              child: status ? const Icon(
             Icons.done_sharp,
             size: 12,
             color: Colors.white,
@@ -227,58 +235,64 @@ Widget SessionCard(size, status, index, sessions) {
           color: status ? Colors.grey.withOpacity(0.35) : Colors.transparent),
       Container(
           constraints: BoxConstraints(minHeight: size.height * 0.2),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Text(
-                    "Session ${index+1}",
-                    style:
-                        h2.copyWith(fontWeight: FontWeight.w600, fontSize: 21),
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: status ? Colors.blue : Colors.grey,
-                      borderRadius: BorderRadius.circular(22),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                          left: 20, right: 20, top: 8, bottom: 8),
-                      child: Text(
-                        status ? "Completed" : "Start",
-                        style: sub1.copyWith(color: Colors.white, fontSize: 10),
-                      ),
-                    ),
-                  ),
-                  (status) ? Obx(
-                    ()=>Text(
-                      "Performed at\n ${sessions[index].timeStamp}",
-                      style: sub1,
-                    ),
-                  ) : SizedBox(),
-                ],
-              ),
-              Container(
-                width: size.width * 0.35,
-                height: size.height * 0.18,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                      fit: BoxFit.cover,
-                      image: AssetImage('assets/images/1.jpg')),
-                  borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                  color: Colors.redAccent,
-                ),
-              ),
-            ],
-          ),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
               color: Color(0xff9c9c9c),
               width: 2.5,
             ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Padding(
+                padding: EdgeInsets.only(left: 18.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Text(
+                      "Session ${index+1}",
+                      style:
+                          h2.copyWith(fontWeight: FontWeight.w600, fontSize: 21),
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: status ? Colors.blue : Colors.grey,
+                        borderRadius: BorderRadius.circular(22),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            left: 20, right: 20, top: 8, bottom: 8),
+                        child: Text(
+                          status ? "Completed" : "Start",
+                          style: sub1.copyWith(color: Colors.white, fontSize: 10),
+                        ),
+                      ),
+                    ),
+                    (status) ? Obx(
+                      ()=>Text(
+                        "Performed at\n ${sessions[index].timeStamp}",
+                        style: sub1,
+                      ),
+                    ) : SizedBox(),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: Container(
+                  width: size.width * 0.35,
+                  height: size.height * 0.18,
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                        fit: BoxFit.cover,
+                        image: AssetImage('assets/images/3.jpg')),
+                    borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                    color: Colors.redAccent,
+                  ),
+                ),
+              ),
+            ],
           )),
     ],
   );
