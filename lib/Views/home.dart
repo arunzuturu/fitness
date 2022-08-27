@@ -1,4 +1,5 @@
 
+import 'package:fitness/View_Model/rehab_viewmodel.dart';
 import 'package:fitness/View_Model/session_viewmodel.dart';
 import 'package:fitness/constants.dart';
 import "package:flutter/material.dart";
@@ -15,6 +16,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final progController = Get.put(ProgressController());
+  final storeController = Get.put(RehabController());
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
@@ -23,6 +25,7 @@ class _HomeState extends State<Home> {
           onTap: () {
             progController.addSession();
             progController.getCount();
+            storeController.updateSessions();
           },
           child: Container(
             width: size.width * 0.6,

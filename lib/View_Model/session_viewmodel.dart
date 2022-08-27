@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../Models/session_model.dart';
 
+
 class ProgressController extends GetxController
 {
   final fb = FirebaseDatabase.instanceFor(app: Firebase.app(),databaseURL: "https://fitness-87807-default-rtdb.asia-southeast1.firebasedatabase.app");
@@ -39,7 +40,6 @@ class ProgressController extends GetxController
             s.session = element.value.toString();
             data.add(s);
           }
-          // print(event.snapshot.children.length);
         }
      });
    }
@@ -53,19 +53,13 @@ class ProgressController extends GetxController
       {
         await ref.set("Session ${index.value}");
         index.value+=1;
-        print(index.value);
       }
     else if(data[index.value-1].timeStamp != time)
       {
         await ref.set("Session ${index.value}");
         index.value+=1;
-        print(index.value);
       }
 
-    for(int i=0; i<data.length; i++)
-      {
-        print(data[i].timeStamp);
-      }
   }
 
 }
