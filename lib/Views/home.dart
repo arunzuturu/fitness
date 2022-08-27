@@ -1,11 +1,9 @@
-import 'package:firebase_core/firebase_core.dart';
+
 import 'package:fitness/View_Model/session_viewmodel.dart';
 import 'package:fitness/constants.dart';
 import "package:flutter/material.dart";
-import 'package:firebase_database/firebase_database.dart';
 import 'package:get/get.dart';
 import 'package:timeline_tile/timeline_tile.dart';
-import 'package:intl/intl.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
 class Home extends StatefulWidget {
@@ -17,17 +15,13 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final progController = Get.put(ProgressController());
-  final fb = FirebaseDatabase.instanceFor(
-      app: Firebase.app(),
-      databaseURL:
-          "https://fitness-87807-default-rtdb.asia-southeast1.firebasedatabase.app");
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     return Scaffold(
         floatingActionButton: InkWell(
           onTap: () {
-            _addsession();
+            progController.addSession();
             progController.getCount();
           },
           child: Container(
@@ -37,12 +31,12 @@ class _HomeState extends State<Home> {
                 borderRadius: BorderRadius.circular(30),
                 color: Color(0xff5196ff),
                 boxShadow: [
-                  new BoxShadow(
+                  BoxShadow(
                     color: Colors.black.withOpacity(0.3),
                     blurRadius: 20.0,
                   ),
                 ]),
-            child: Center(
+            child: const Center(
                 child: Text(
               "Start Session",
               style: TextStyle(color: Colors.white),
@@ -74,7 +68,7 @@ class _HomeState extends State<Home> {
                             child: ListView.builder(
                                 itemCount: 10,
                                 itemBuilder: (context, index) {
-                                  return Obx(()=> TimeLine(size, progController.bools[index], index));
+                                  return Obx(()=> TimeLine(size, progController.bools[index], index,progController.data));
                                 }),
                           )
                         ],
@@ -86,14 +80,6 @@ class _HomeState extends State<Home> {
             ),
           ),
         ));
-  }
-
-  Future<void> _addsession() async {
-    final now = new DateTime.now();
-    String formatter = now.toString().substring(0, 10);
-    String time = DateFormat.jm().format(now);
-    var ref = fb.ref('sessions/$formatter/$time');
-    await ref.set("Session 7");
   }
 }
 
@@ -201,7 +187,7 @@ Widget HeadingCard(size, percentage) {
       ));
 }
 
-Widget TimeLine(size, status, index) {
+Widget TimeLine(size, status, index, sessions) {
   return Column(
     children: [
       TimelineTile(
@@ -224,13 +210,13 @@ Widget TimeLine(size, status, index) {
         isFirst: index==0 ? true : false,
         endChild: Padding(
             padding: const EdgeInsets.all(18.0),
-            child: SessionCard(size, status)),
+            child: SessionCard(size, status, index, sessions)),
       ),
     ],
   );
 }
 
-Widget SessionCard(size, status) {
+Widget SessionCard(size, status, index, sessions) {
   return Stack(
     children: [
       Container(
@@ -245,28 +231,30 @@ Widget SessionCard(size, status) {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Text(
-                    "Session 1",
+                    "Session ${index+1}",
                     style:
                         h2.copyWith(fontWeight: FontWeight.w600, fontSize: 21),
                   ),
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.blue,
+                      color: status ? Colors.blue : Colors.grey,
                       borderRadius: BorderRadius.circular(22),
                     ),
                     child: Padding(
                       padding: const EdgeInsets.only(
                           left: 20, right: 20, top: 8, bottom: 8),
                       child: Text(
-                        "Completed",
+                        status ? "Completed" : "Start",
                         style: sub1.copyWith(color: Colors.white, fontSize: 10),
                       ),
                     ),
                   ),
-                  Text(
-                    "Performed at\n 8:02 PM",
-                    style: sub1,
-                  )
+                  (status) ? Obx(
+                    ()=>Text(
+                      "Performed at\n ${sessions[index].timeStamp}",
+                      style: sub1,
+                    ),
+                  ) : SizedBox(),
                 ],
               ),
               Container(
